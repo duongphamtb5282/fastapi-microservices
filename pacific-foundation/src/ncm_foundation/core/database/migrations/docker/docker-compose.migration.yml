@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+  migration:
+    build:
+      context: .
+      dockerfile: migrations/docker/Dockerfile.migration
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - MIGRATION_ENVIRONMENT=${MIGRATION_ENVIRONMENT:-development}
+      - MIGRATION_DRY_RUN=${MIGRATION_DRY_RUN:-false}
+      - MIGRATION_VERBOSE=${MIGRATION_VERBOSE:-false}
+      - MIGRATION_BACKUP_BEFORE_MIGRATION=${MIGRATION_BACKUP_BEFORE_MIGRATION:-true}
+    volumes:
+      - ./migrations:/app/migrations
+      - ./alembic:/app/alembic
+      - migration_backups:/app/backups
+    networks:
+      - ncm-network
+    depends_on:
+      - postgres
+      - mongodb
+    command:
+      [
+        "python",
+        "-m",
+        "migrations.runner",
+        "run",
+        "--target-version",
+        "${TARGET_VERSION:-}",
+      ]
+    restart: "no"
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-ncm}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ncm-network
+    ports:
+      - "5432:5432"
+
+  mongodb:
+    image: mongo:6
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-password}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - ncm-network
+    ports:
+      - "27017:27017"
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  migration_backups:
+
+networks:
+  ncm-network:
+    driver: bridge

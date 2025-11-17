@@ -1,0 +1,19 @@
+{
+  "name": "ncm-foundation",
+  "version": "0.1.0",
+  "build_timestamp": "1760949132.784047",
+  "python_version": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 10:14:12) [Clang 14.0.6 ]",
+  "platform": "darwin",
+  "packages": [
+    {
+      "name": "ncm_foundation-0.1.0-py3-none-any.whl",
+      "size": 182886,
+      "type": "wheel"
+    },
+    {
+      "name": "ncm_foundation-0.1.0.tar.gz",
+      "size": 128135,
+      "type": "source"
+    }
+  ]
+}
